@@ -1,54 +1,60 @@
-pub fn method(matrix: &mut Vec<Vec<f64>>) {
+pub fn method(matrix: &mut Vec<Vec<f64>>) -> Vec<f64> {
     let m = matrix.len();
     let n = matrix[0].len() - 1;
 
-    let mut pivot_row = 1;
-    let mut pivot_column = 1;
+    let mut row = 0;
+    for col in 0..n {
+        let mut pivot_row = row;
+        for i in (row + 1)..m {
+            if matrix[i][col].abs() > matrix[pivot_row][col].abs() {
+                pivot_row = i;
+            }
+        }
 
-    while pivot_row <= m && pivot_column <= n {
-        let i_max = find_max(matrix, m, pivot_row, pivot_column);
+        if matrix[pivot_row][col].abs() < 1e-12 {
+            continue;
+        }
 
-        if matrix[i_max][pivot_column] == 0.0 {
-            pivot_column += 1;
-        } else {
-            swap_row(matrix, pivot_row, i_max);
+        matrix.swap(row, pivot_row);
 
-            for i in pivot_row + 1..m {
-                let factor = matrix[i][pivot_column] / matrix[pivot_row][pivot_column];
-                matrix[i][pivot_column] = 0.0;
+        for i in (row + 1)..m {
+            let factor = matrix[i][col] / matrix[row][col];
+            for j in col..=n {
+                matrix[i][j] -= factor * matrix[row][j];
+            }
+        }
 
-                for j in pivot_column + 1..n {
-                    matrix[i][j] = matrix[i][j] - matrix[pivot_row][j] * factor;
+        row += 1;
+        if row >= m {
+            break;
+        }
+    }
+
+    let mut solution = vec![0.0; n];
+    for i in (0..m).rev() {
+        let mut leading_var = None;
+        for j in 0..n {
+            if matrix[i][j].abs() > 1e-12 {
+                leading_var = Some(j);
+                break;
+            }
+        }
+
+        match leading_var {
+            Some(j) => {
+                let mut sum = 0.0;
+                for k in (j + 1)..n {
+                    sum += matrix[i][k] * solution[k];
+                }
+                solution[j] = (matrix[i][n] - sum) / matrix[i][j];
+            }
+            None => {
+                if matrix[i][n].abs() > 1e-12 {
+                    panic!("Sistema impossível (linha inconsistente encontrada).");
                 }
             }
-
-            pivot_row += 1;
-            pivot_column += 1;
-        }
-    }
-}
-
-fn find_max(
-    matrix: &mut Vec<Vec<f64>>,
-    size: usize,
-    pivot_row: usize,
-    pivot_column: usize,
-) -> usize {
-    let mut max = 0.0;
-    let mut index: usize = 1;
-
-    for i in pivot_row..size {
-        if matrix[i][pivot_column] > max {
-            max = matrix[i][pivot_column];
-            index = i;
         }
     }
 
-    index
-}
-
-fn swap_row(matrix: &mut Vec<Vec<f64>>, source_row: usize, target_row: usize) {
-    let tmp = matrix[source_row].clone();
-    matrix[source_row] = matrix[target_row].clone();
-    matrix[target_row] = tmp;
+    solution
 }
