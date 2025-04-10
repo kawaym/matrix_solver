@@ -1,4 +1,4 @@
-pub fn method(matrix: &mut Vec<Vec<f64>>) -> Vec<f64> {
+pub fn method(matrix: &mut Vec<Vec<f64>>) -> Option<Vec<f64>> {
     let m = matrix.len();
     let n = matrix[0].len() - 1;
 
@@ -50,11 +50,11 @@ pub fn method(matrix: &mut Vec<Vec<f64>>) -> Vec<f64> {
             }
             None => {
                 if matrix[i][n].abs() > 1e-12 {
-                    panic!("Sistema impossível (linha inconsistente encontrada).");
+                    return None;
                 }
             }
         }
     }
 
-    solution
+    Some(solution)
 }

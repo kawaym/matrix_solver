@@ -1,23 +1,17 @@
-use matrix_solver::direct_solution::gaussian_elimination::method;
+use matrix_solver::direct_solution::gaussian_elimination::method as gauss_elimination;
+use matrix_solver::direct_solution::lu_decomposition::method as lu_decomposition;
+use matrix_solver::file_utils;
+use matrix_solver::iteractive_solution::jacobi_method::method as jacobi_method;
+use matrix_solver::time_utils;
 
 fn main() {
-    let mut matrix = vec![
-        vec![1.5, 2.0, 1.0, -1.0, -2.0, 1.0, 1.0],
-        vec![3.0, 3.0, -1.0, 16.0, 18.0, 1.0, 1.0],
-        vec![1.0, 1.0, 3.0, -2.0, -6.0, 1.0, 1.0],
-        vec![1.0, 1.0, 99.0, 19.0, 2.0, 1.0, 1.0],
-        vec![1.0, -2.0, 16.0, 1.0, 9.0, 10.0, 1.0],
-        vec![1.0, 3.0, 1.0, -5.0, 1.0, 1.0, 95.0],
-        // vec![2.0, 6.0, 2.0, -10.0, 2.0, 2.0, 190.0],
-    ];
+    let mut matrix = file_utils::read_matrix("matrix.txt");
 
-    let mut matrix2: Vec<Vec<f64>> = vec![
-        vec![3.0, -1.0, -1.0, 1.0],
-        vec![-1.0, 3.0, -1.0, 2.0],
-        vec![-1.0, -1.0, 3.0, 1.0],
-    ];
+    println!("{:?}", matrix);
 
-    let result = method(&mut matrix2);
-
+    let result = time_utils::calculate_direct_runtime(&mut matrix, &mut gauss_elimination);
+    let result = time_utils::calculate_direct_runtime(&mut matrix, &mut lu_decomposition);
+    let result =
+        time_utils::calculate_iteractve_runtime(&mut matrix, None, None, &mut jacobi_method);
     println!("{:?}", result);
 }

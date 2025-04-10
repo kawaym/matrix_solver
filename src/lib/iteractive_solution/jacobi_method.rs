@@ -40,7 +40,6 @@ pub fn method(
             error += (x_new[i] - x_old[i]).abs();
         }
 
-        println!("{}", error);
         if error < tolerance.unwrap_or(TOLERANCE) {
             return Some(x_new);
         }
